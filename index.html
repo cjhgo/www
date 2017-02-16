@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+</head>
+<body>
+    <main>
+
+    </main>
+    <script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+        window.data = {}
+        $.ajax({
+            url: "http://api.cjhang.com/v1/getlinks/",
+            type: "GET",
+            success: function (data) {
+                window.data = data.data;
+                initMain()
+
+            }
+        })
+
+        function initMain() {
+            var html = "";
+            /*
+            for (var i = 0, len = window.data.length; i < len; i++) {
+                var item = window.data[i]
+                var link = item.link;
+                var datetime = item.crts;
+                html += "<div><a href='"+link+"'>"+datetime+"</a></div>"
+            }
+            */
+
+            window.data.forEach(function (item) {
+                var link = item.link;
+                var datetime = item.crts;
+                html += "<div><a href='"+link+"'>"+link+"</a></div>"
+            })
+            console.log(html)
+            $("main").html(html)
+
+        }
+    </script>
+</body>
+</html>
