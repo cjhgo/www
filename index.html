@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-
 </head>
 <body>
     <main>
@@ -16,9 +16,13 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script>
+        if(window.location.href == "http://info.local.cjhang.com:5000/")
+            window.host = "http://info.local.cjhang.com:5000"
+        else
+            window.host = "http://api.cjhang.com"
         window.data = {}
         $.ajax({
-            url: "http://api.cjhang.com/v1/getlinks/",
+            url: window.host+"/v1/getlinks/",
             type: "GET",
             success: function (data) {
                 window.data = data.data;
@@ -37,15 +41,51 @@
                 html += "<div><a href='"+link+"'>"+datetime+"</a></div>"
             }
             */
-
-            window.data.forEach(function (item) {
+            window.links = new Array()
+            window.data.forEach(function (item, i) {
                 var link = item.link;
+                window.links.push(link);
                 var datetime = item.crts;
-                html += "<div><a href='"+link+"'>"+link+"</a></div>"
+                html += "<div><a id='link_" + i + "' href='"+link+"'>"+link+"</a></div>"
             })
             console.log(html)
             $("main").html(html)
+            get_titles()
 
+        }
+
+        function get_titles()
+        {
+
+            var _ = window.links.map(function (item) {
+                return "url="+encodeURIComponent(item);
+            })
+            var query_string = _.join("&");
+            $.ajax({
+                url: window.host+"/v1/gettitles",
+                type: "POST",
+                data: query_string,
+                success: function (data) {
+                    window.titles = data.data;
+                    render_title()
+                }
+            })
+        }
+        function render_title()
+        {
+            var flag = false;
+            window.titles.forEach(function (item, i) {
+                var selector = "#link_" +i;
+                $(selector).text(window.titles[i])
+                if(item == null)
+                {
+                    flag = true;
+                }
+            })
+            if(flag)
+            {
+                setTimeout(get_titles, 2000)
+            }
         }
     </script>
 </body>
