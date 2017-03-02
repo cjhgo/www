@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+    <main>
+        <div class="item">
+            <div class="content">
+                ${content}
+            </div>
+            <div class="urls">
+                ${urls}
+            </div>
+        </div>
+    </main>
+    <script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+        window.api_host = window.location.protocol + "//" + "{{ api_host() }}";
+        window.data = {}
+        $.ajax({
+            url: window.api_host+"/v1/getkeywords/",
+            type: "GET",
+            success: function (data) {
+                window.data = data.data;
+                initMain()
+
+            }
+        })
+
+        function initMain() {
+
+            var url_base = '<a href="${href}">${text}</a>'
+            var html = "";
+//            var hh = 111
+//            var gg = `wo shi ${hh}`
+            window.links = new Array()
+            window.data.forEach(function (item, i) {
+                var link = item.link;
+                window.links.push(link);
+                var datetime = item.crts;
+                html += "<div><a id='link_" + i + "' href='"+link+"'>"+link+"</a></div>";
+                let content = '';
+                let urls = '';
+                item.content.forEach(function (item) {
+                    let href = "https://www.google.com/search?q="+item;
+                    let text = item;
+                    content +=`<a href="${href}">${text}</a>`;
+                });
+                item.urls.forEach(function (item) {
+                    let href = item, text = item;
+                    urls += `<a href="${href}">${text}</a>`;
+                })
+                var content_div = `<div class="item">\
+                                <div class="content">\
+                                    ${content}\
+                                </div>\
+                                <div class="urls">\
+                                    ${urls}\
+                                </div>\
+                            </div>`
+                html += content_div;
+
+            })
+            console.log(html)
+            $("main").html(html)
+            //get_titles()
+
+        }
+
+        function get_titles()
+        {
+
+            var _ = window.links.map(function (item) {
+                return "url="+encodeURIComponent(item);
+            })
+            var query_string = _.join("&");
+            $.ajax({
+                url: window.api_host+"/v1/gettitles",
+                type: "POST",
+                data: query_string,
+                success: function (data) {
+                    window.titles = data.data;
+                    render_title()
+                }
+            })
+        }
+        function render_title()
+        {
+            var flag = false;
+            window.titles.forEach(function (item, i) {
+                var selector = "#link_" +i;
+                $(selector).text(window.titles[i])
+                if(item == null)
+                {
+                    flag = true;
+                }
+            })
+            if(flag)
+            {
+                setTimeout(get_titles, 2000)
+            }
+        }
+    </script>
+</body>
+</html>
