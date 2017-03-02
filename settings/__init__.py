@@ -5,6 +5,6 @@ import os
 
 API_HOST = "info.local.cjhang.com"
 
-www_env = os.getenv("WWW_ENV", "local")
+www_env = os.getenv("API_ENV", "local")
 if www_env == "production":
     from production import *
