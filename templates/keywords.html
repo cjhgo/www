@@ -5,23 +5,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
+    <link href="/static/css/global.css" type="text/css" rel="stylesheet" />
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    -->
+    <style>
+        main{
+            width: 100%;
+            background: #fff;
+            margin: 5px 5px auto;
+            text-align: center;
+
+        }
+        .content {
+            margin-bottom: 10px;
+        }
+        .col-center-block{
+            float: none;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body>
     <main>
-        <div class="item">
-            <div class="content">
-                ${content}
-            </div>
-            <div class="urls">
-                ${urls}
-            </div>
-        </div>
+
     </main>
-    <script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <!--<script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>-->
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
+    <script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
     <script>
         window.api_host = window.location.protocol + "//" + "{{ api_host() }}";
         window.data = {}
@@ -36,27 +50,22 @@
         })
 
         function initMain() {
-
-            var url_base = '<a href="${href}">${text}</a>'
             var html = "";
-//            var hh = 111
-//            var gg = `wo shi ${hh}`
             window.links = new Array()
             window.data.forEach(function (item, i) {
                 var link = item.link;
-                window.links.push(link);
                 var datetime = item.crts;
-                html += "<div><a id='link_" + i + "' href='"+link+"'>"+link+"</a></div>";
                 let content = '';
                 let urls = '';
                 item.content.forEach(function (item) {
                     let href = "https://www.google.com/search?q="+item;
                     let text = item;
-                    content +=`<a href="${href}">${text}</a>`;
+                    content +=`<div><a  target="_blank" href="${href}">${text}</a></div>`;
                 });
                 item.urls.forEach(function (item) {
                     let href = item, text = item;
-                    urls += `<a href="${href}">${text}</a>`;
+                    urls += `<div><a  target="_blank" href="${href}">${text}</a></div>`;
+                    window.links.push(item)
                 })
                 var content_div = `<div class="item">\
                                 <div class="content">\
@@ -73,7 +82,7 @@
             })
             console.log(html)
             $("main").html(html)
-            //get_titles()
+            get_titles()
 
         }
 
@@ -98,7 +107,9 @@
         {
             var flag = false;
             window.titles.forEach(function (item, i) {
-                var selector = "#link_" +i;
+                let href = (window.links[i]).replace('"', '\\"');
+                var selector = `a[href="${href}"]`;
+                console.log(selector);
                 $(selector).text(window.titles[i])
                 if(item == null)
                 {

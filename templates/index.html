@@ -5,24 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="/static/css/global.css" type="text/css" rel="stylesheet" />
+    <style>
+         main{
+            width: 100%;
+            background: #fff;
+            margin: 5px 5px auto;
+            text-align: center;
+         }
+         .item{
+             background: skyblue;
+             margin: 3px auto;
+         }
+    </style>
 </head>
 <body>
     <main>
 
     </main>
-    <script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
     <script>
-        if(window.location.href == "http://info.local.cjhang.com:5000/")
-            window.host = "http://info.local.cjhang.com:5000"
-        else
-            window.host = "http://api.cjhang.com"
+        window.api_host = window.location.protocol + "//" + "{{ api_host() }}";
         window.data = {}
         $.ajax({
-            url: window.host+"/v1/getlinks/",
+            url: window.api_host+"/v1/getlinks/",
             type: "GET",
             success: function (data) {
                 window.data = data.data;
@@ -33,20 +39,12 @@
 
         function initMain() {
             var html = "";
-            /*
-            for (var i = 0, len = window.data.length; i < len; i++) {
-                var item = window.data[i]
-                var link = item.link;
-                var datetime = item.crts;
-                html += "<div><a href='"+link+"'>"+datetime+"</a></div>"
-            }
-            */
             window.links = new Array()
             window.data.forEach(function (item, i) {
                 var link = item.link;
                 window.links.push(link);
                 var datetime = item.crts;
-                html += "<div><a id='link_" + i + "' href='"+link+"'>"+link+"</a></div>"
+                html += `<div class="item"><a  target="_blank" id="link_${i}" href="${link}">${link}</a></div>`
             })
             console.log(html)
             $("main").html(html)
@@ -62,7 +60,7 @@
             })
             var query_string = _.join("&");
             $.ajax({
-                url: window.host+"/v1/gettitles",
+                url: window.api_host+"/v1/gettitles",
                 type: "POST",
                 data: query_string,
                 success: function (data) {
