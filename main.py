@@ -17,6 +17,9 @@ def api_host():
 def index():
     return render_template("index.html")
 
+@app.route("/links")
+def links():
+    return render_template("links.html")
 
 @app.route("/keywords")
 def keywords():
