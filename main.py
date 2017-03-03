@@ -22,5 +22,9 @@ def index():
 def keywords():
     return render_template("keywords.html")
 
+@app.route("/coder")
+def coder():
+    return render_template("coder.html")
+
 if __name__ == "__main__":
     app.run(port=7000, debug=True)
