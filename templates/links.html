@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <link href="/static/css/global.css" type="text/css" rel="stylesheet" />
+    <style>
+         main{
+            width: 100%;
+            background: #fff;
+            margin: 5px 5px auto;
+            text-align: center;
+         }
+         .item{
+             background: skyblue;
+             margin: 3px auto;
+         }
+    </style>
+</head>
+<body>
+    <main>
+
+    </main>
+    <script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+    <script>
+        window.api_host = window.location.protocol + "//" + "{{ api_host() }}";
+        window.data = {}
+        $.ajax({
+            url: window.api_host+"/v1/getlinks/",
+            type: "GET",
+            success: function (data) {
+                window.data = data.data;
+                initMain()
+
+            }
+        })
+
+        function initMain() {
+            var html = "";
+            window.links = new Array()
+            window.data.forEach(function (item, i) {
+                var link = item.link;
+                window.links.push(link);
+                var datetime = item.crts;
+                html += `<div class="item"><a  target="_blank" id="link_${i}" href="${link}">${link}</a></div>`
+            })
+            console.log(html)
+            $("main").html(html)
+            get_titles()
+
+        }
+
+        function get_titles()
+        {
+
+            var _ = window.links.map(function (item) {
+                return "url="+encodeURIComponent(item);
+            })
+            var query_string = _.join("&");
+            $.ajax({
+                url: window.api_host+"/v1/gettitles",
+                type: "POST",
+                data: query_string,
+                success: function (data) {
+                    window.titles = data.data;
+                    render_title()
+                }
+            })
+        }
+        function render_title()
+        {
+            var flag = false;
+            window.titles.forEach(function (item, i) {
+                var selector = "#link_" +i;
+                $(selector).text(window.titles[i])
+                if(item == null)
+                {
+                    flag = true;
+                }
+            })
+            if(flag)
+            {
+                setTimeout(get_titles, 2000)
+            }
+        }
+    </script>
+</body>
+</html>
