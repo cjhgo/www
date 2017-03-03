@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <link href="/static/css/global.css" type="text/css" rel="stylesheet" />
+    <!-- Latest compiled and minified CSS -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    -->
+    <style>
+        main{
+            width: 100%;
+            background: #fff;
+            margin: 5px 5px auto;
+            text-align: center;
+
+        }
+        span{float: left;}
+        .content {
+            margin-bottom: 10px;
+        }
+        .col-center-block{
+            float: none;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <main>
+
+    </main>
+    <!--<script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>-->
+    <!-- Latest compiled and minified JavaScript -->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
+    <script src="//cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+    <script>
+        window.api_host = window.location.protocol + "//" + "{{ api_host() }}";
+        window.data = {}
+        $.ajax({
+            url: window.api_host+"/v1/getblogs/",
+            type: "GET",
+            success: function (data) {
+                window.data = data.data;
+                initMain()
+
+            }
+        })
+
+        function initMain() {
+            var html = "";
+            window.links = new Array()
+            window.data.forEach(function (item, i) {
+                var block_html = '<div class="item">'
+                Object.keys(item).forEach(function (key) {
+                    var _ = '';
+                    var value = item[key]
+                    if(Is_Url(value))
+                    {
+                        _ = `<div><span>${key}</span><a href="${value}" target="_blank">${value}</a></div>`;
+                        window.links.push(value);
+                    }
+                    else
+                    {
+                        _ = `<div><span>${key}</span><p>${value}</p></div>`;
+                    }
+                    block_html += _;
+                })
+                html += (block_html+"<br><br></div>")
+
+            })
+            console.log(html)
+            $("main").html(html)
+            get_titles()
+
+        }
+
+        function get_titles()
+        {
+
+            var _ = window.links.map(function (item) {
+                return "url="+encodeURIComponent(item);
+            })
+            var query_string = _.join("&");
+            $.ajax({
+                url: window.api_host+"/v1/gettitles",
+                type: "POST",
+                data: query_string,
+                success: function (data) {
+                    window.titles = data.data;
+                    render_title()
+                }
+            })
+        }
+        function render_title()
+        {
+            var flag = false;
+            window.titles.forEach(function (item, i) {
+                let href = (window.links[i]).replace('"', '\\"');
+                var selector = `a[href="${href}"]`;
+                console.log(selector);
+                $(selector).text(window.titles[i])
+                if(item == null)
+                {
+                    flag = true;
+                }
+            })
+            if(flag)
+            {
+                setTimeout(get_titles, 2000)
+            }
+        }
+        function Is_Url(string)
+        {
+            var pattern = new RegExp('^(https?:\/\/)');
+            if(!pattern.test(string))
+                return false;
+            else
+                return true;
+        }
+    </script>
+</body>
+</html>
