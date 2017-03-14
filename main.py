@@ -1,7 +1,8 @@
 #coding: utf-8
 #created at 17-3-2 11:12
 
-from flask import Flask
+import json
+from flask import Flask, request
 from flask.templating import render_template
 from settings import API_HOST
 
@@ -13,7 +14,7 @@ def api_host():
     return API_HOST
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
 
@@ -32,6 +33,11 @@ def coder():
 @app.route("/temp")
 def temp():
     return render_template("temp.html")
+
+
+@app.route("/notes")
+def notes():
+    return render_template("notes.html")
 
 if __name__ == "__main__":
     app.run(port=7000, debug=True)
